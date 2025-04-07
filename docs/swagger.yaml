@@ -1,0 +1,154 @@
+openapi: 3.0.0
+info:
+  title: Movie Match API
+  description: API para búsqueda y recomendación de películas
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: Servidor de desarrollo
+
+paths:
+  /api/movies:
+    get:
+      summary: Obtener todas las películas
+      description: Retorna la lista de todas las películas disponibles con opciones de filtrado
+      parameters:
+        - name: title
+          in: query
+          schema:
+            type: string
+          description: Título parcial de la película
+        - name: genre
+          in: query
+          schema:
+            type: string
+          description: Género de la película
+        - name: year
+          in: query
+          schema:
+            type: integer
+          description: Año específico de la película
+        - name: fromYear
+          in: query
+          schema:
+            type: integer
+          description: Año inicial del rango de búsqueda
+        - name: toYear
+          in: query
+          schema:
+            type: integer
+          description: Año final del rango de búsqueda
+      responses:
+        '200':
+          description: Lista de películas obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                      movies:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Movie'
+        '400':
+          description: Parámetros de búsqueda inválidos
+        '404':
+          description: No se encontraron películas
+        '500':
+          description: Error interno del servidor
+
+  /movies/search:
+    get:
+      summary: Buscar películas por criterios
+      description: Busca películas por nombre, género y/o año
+      parameters:
+        - name: name
+          in: query
+          schema:
+            type: string
+          description: Nombre de la película
+        - name: genre
+          in: query
+          schema:
+            type: string
+          description: Género de la película
+        - name: year
+          in: query
+          schema:
+            type: integer
+          description: Año de la película
+      responses:
+        '200':
+          description: Películas encontradas
+        '404':
+          description: No se encontraron películas
+        '500':
+          description: Error interno del servidor
+
+  /movies/rating:
+    get:
+      summary: Obtener películas por calificación de IMDb
+      description: Retorna una lista de películas filtradas por calificación de IMDb
+      parameters:
+        - name: min_rating
+          in: query
+          schema:
+            type: number
+          description: Calificación mínima de IMDb
+        - name: max_rating
+          in: query
+          schema:
+            type: number
+          description: Calificación máxima de IMDb
+        - name: limit
+          in: query
+          schema:
+            type: integer
+          description: Número máximo de resultados a devolver
+      responses:
+        '200':
+          description: Lista de películas obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Movie'
+        '400':
+          description: Solicitud incorrecta
+        '500':
+          description: Error interno del servidor
+
+components:
+  schemas:
+    Movie:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        genre:
+          type: string
+        year:
+          type: integer
+        director:
+          type: string
+        actors:
+          type: string
+        plot:
+          type: string
+        imdb_rating:
+          type: number
+        runtime_minutes:
+          type: integer 
